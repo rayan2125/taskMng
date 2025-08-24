@@ -1,3 +1,4 @@
+const User = require("../models/authModels.js");
 const Task  = require ("../models/taskModels.js");
 const { Op } = require ("sequelize");
 
@@ -16,7 +17,7 @@ const VALID_STATUSES = ["pending", "in_progress", "done"];
         status: 400,
         message: "Title is required. !!!",
       };
-      
+
     }
 
     
@@ -87,6 +88,10 @@ const VALID_STATUSES = ["pending", "in_progress", "done"];
       limit,
       offset,
       order: [["createdAt", "DESC"]],
+      include:[{
+        model: User,
+      attributes: ["id", "name", "email"] 
+      }]
     });
 
     return {
@@ -119,7 +124,12 @@ const VALID_STATUSES = ["pending", "in_progress", "done"];
   const { id } = params;
 
   try {
-    const result = await Task.findOne({ where: { id, user_id: user?.id } });
+    const result = await Task.findOne({ where: { id, user_id: user?.id },
+      include:[{
+        model: User,
+      attributes: ["id", "name", "email"] 
+      }]
+     });
 
     if (!result) {
       return {
